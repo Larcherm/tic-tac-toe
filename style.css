@@ -1,0 +1,34 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    margin: 0;
+}
+
+#gameboard-container {
+    height: 40vh;
+    width: 40vh;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.gameboard-row {
+    flex: 1;
+    display: flex;
+    gap: 10px;
+}
+
+.gameboard-cell {
+    background-color: lightgrey;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
