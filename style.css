@@ -4,31 +4,69 @@
 
 body {
     height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    display: grid;
+    grid-template-rows: minmax(0, 20%) minmax(0, 20%) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 35%) minmax(0, 1fr);
     padding: 0;
     margin: 0;
+    background-color: #f1c7ef;
 }
 
-#gameboard-container {
-    height: 40vh;
-    width: 40vh;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.gameboard-row {
-    flex: 1;
-    display: flex;
-    gap: 10px;
-}
-
-.gameboard-cell {
-    background-color: lightgrey;
-    flex: 1;
+.header {
+    grid-column: 2 / 3;
+    grid-row : 1 / 2;
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+form {
+    grid-row: 2 / 3;
+    grid-column: 2 / 3;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    place-items: end center;
+}
+
+.board-container {
+    grid-column: 2 / 3;
+    grid-row: 3 / 4;
+    display: flex;
+    justify-content: center;
+    align-items: start;
+}
+
+#board {
+    display: none;
+    height: 40vh;
+    width: 40vh;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.board-cell {
+    background-color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 62px;
+}
+
+.board-cell:hover {
+    background-color: purple;
+}
+
+#start-button {
+    grid-column: 1 / 2;
+    height: 30px;
+    width: 80px;
+    place-self: center;
+}
+
+#restart-button {
+    grid-column: 2 / 3;
+    height: 30px;
+    width: 80px;
+    place-self: center;
 }
