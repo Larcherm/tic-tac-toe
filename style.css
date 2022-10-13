@@ -13,11 +13,15 @@ body {
 }
 
 .header {
-    grid-column: 2 / 3;
+    grid-column: 1 / 4;
     grid-row : 1 / 2;
     display: flex;
     justify-content: center;
     align-items: center;
+    background-color: violet;
+    font-size: 40px;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    z-index: 100;
 }
 
 form {
@@ -26,18 +30,34 @@ form {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     place-items: end center;
+    position: relative;
+    z-index: 1;
 }
 
-.board-container {
+.banner {
+    display: none;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background-color: #f1c7ef;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    place-items: center;
+}
+
+
+#board-container {
     grid-column: 2 / 3;
     grid-row: 3 / 4;
-    display: flex;
-    justify-content: center;
-    align-items: start;
+    display: none;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
+    gap: 20px;
 }
 
 #board {
-    display: none;
+    display: grid;
     height: 40vh;
     width: 40vh;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -51,6 +71,7 @@ form {
     justify-content: center;
     align-items: center;
     font-size: 62px;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
 }
 
 .board-cell:hover {
@@ -64,9 +85,21 @@ form {
     place-self: center;
 }
 
-#restart-button {
+.restart-container {
+    display: flex;
+    gap: 16px;
+}
+
+.restart-container button {
     grid-column: 2 / 3;
-    height: 30px;
+    height: 50px;
     width: 80px;
     place-self: center;
+}
+
+#result-announcement {
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }

@@ -21,9 +21,14 @@
             <input type="text" id="second-player">
         </div>
         <button id="start-button">START</button>
-        <button id="restart-button">RESTART</button>
+        <div class="banner">
+            <h3 class="banner-player1 banner-title"></h3>
+            <h3 class="banner-player2 banner-title"></h3>
+            <h4 class="rounds-player1"></h4>
+            <h4 class="rounds-player2"></h4>
+        </div>
     </form>
-    <div class="board-container">
+    <div id="board-container">
         <div id="board">
             <div class="board-cell" data-row="0" data-column="0" id="bc0"></div>
             <div class="board-cell" data-row="0" data-column="1"  id="bc1"></div>
@@ -35,9 +40,14 @@
             <div class="board-cell" data-row="2" data-column="1"  id="bc7"></div>
             <div class="board-cell" data-row="2" data-column="2"  id="bc8"></div>
         </div>
+        <div id="result-announcement">
+            <div class="restart-container">
+                <button id="newround-button">NEW ROUND</button>
+                <button id="restart-button">RESTART</button>
+            </div>
+            <h1 class="result-message"></h1>
+        </div>
     </div>
-    <div id="result-announcement">
-        
-    </div>
+   
 </body>
 </html>
