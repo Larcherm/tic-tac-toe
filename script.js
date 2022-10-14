@@ -1,9 +1,9 @@
-const Player = (name = "Player " + index, symbol, index) => {
+const Player = (name = "Player " + index, symbol, index, ai = false) => {
     if (!name) {
         name = "Player " + index;
     }
     return {
-        name, symbol, index, rounds:0
+        name, symbol, index, rounds:0, ai
     };
 }
 
@@ -17,12 +17,13 @@ const gameBoard = (() => {
     const result = document.querySelector(".result-message")
     const banner = document.querySelector(".banner");
     const board_container = document.getElementById("board-container");
+    const form = document.getElementById("form");
 
     board_cells.forEach(board_cell => board_cell.addEventListener("click", e => {
         let turn = game.getTurn();
         if (addSymbol(board_cell, turn)) {
             if (checkWinner(turn.index)) {
-                postResult(`${turn.name.toUpperCase()} WON !!!`);
+                postResult(`${turn.name.toUpperCase()} WON THE ROUND!!!`);
                 game.incrementRounds();
                 setBanner();
             }
@@ -110,6 +111,7 @@ const gameBoard = (() => {
         document.querySelector(".banner-player2").textContent = game.getPlayer2().name;
         document.querySelector(".rounds-player1").textContent = game.getPlayer1().rounds;
         document.querySelector(".rounds-player2").textContent = game.getPlayer2().rounds;
+
     }
 
     function restart() {
@@ -124,12 +126,13 @@ const gameBoard = (() => {
 
 const game = (() => {
     const start_button = document.getElementById("start-button");
+    const radio_result = document.getElementsByName("opponent");
     let turn, player1, player2;
 
     start_button.addEventListener("click", e => {
-        document.getElementById("board-container").style.display = "flex";
         setPlayers();
         gameBoard.setBanner();
+        document.getElementById("board-container").style.display = "flex";
     })
 
     function alternateTurn() {
@@ -165,9 +168,26 @@ const game = (() => {
 
     function setPlayers() {
         player1 = Player(document.getElementById("first-player").value, "X", 1);
-        player2 = Player(document.getElementById("second-player").value, "0", 2);
+        for (let option of radio_result) {
+            if (option.checked) {
+                if (option.value === "human") {
+                player2 = Player(document.getElementById("second-player").value, "0", 2);
+                }
+                else {
+                    player2 = Player("Computer", "0", 2, true);
+                }
+            }
+        }
         turn = player1;
     }
 
     return {getTurn, alternateTurn, getPlayer1, getPlayer2, incrementRounds};
 })();
+
+const ai = (() => { 
+    const board = gameBoard.boardArray;
+
+    if (!board[1][1]) {
+        return
+    }
+})()

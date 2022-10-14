@@ -11,16 +11,25 @@
     <div class="header">
         <h1>TIC TAC TOE</h1>
     </div>
-    <form action="#">
+    <form action="#" id="form">
         <div class="first-player-container">
-            <label for="first-player">First Player Name: </label>
-            <input type="text" id="first-player">
+            <label for="first-player">First Player: </label>
+            <input type="text" id="first-player" placeholder="Name">
         </div>
-        <div class="second-player-container">
-            <label for="second-player">Second Player Name: </label>
-            <input type="text" id="second-player">
+        <div class="radio-container">
+            <div class="radio-div">
+                <input type="radio" value="human" id="human" name="opponent" checked>
+                <label for="human">Human: </label>
+                <input type="text" id="second-player" placeholder="Name">
+            </div>
+            
+            <div class="radio-div radio-computer">
+                <input type="radio" id="ai" value="ai" name="opponent">
+                <label for="ai">Computer</label>
+            </div>
         </div>
         <button id="start-button">START</button>
+
         <div class="banner">
             <h3 class="banner-player1 banner-title"></h3>
             <h3 class="banner-player2 banner-title"></h3>
