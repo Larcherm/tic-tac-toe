@@ -11,6 +11,7 @@ const gameBoard = (() => {
     let boardArray = [["", "", ""], ["", "", ""], ["", "", ""]];
     let moves = 0;
     let game_over = false;
+    let winner;
     const board_cells = document.querySelectorAll(".board-cell");
     const newRound_button = document.getElementById("newround-button");
     const restart_button = document.getElementById("restart-button");
@@ -25,9 +26,8 @@ const gameBoard = (() => {
 
     board_cells.forEach(board_cell => board_cell.addEventListener("click", e => {
         let turn = game.getTurn();
-        console.log("before ai:", moves);       
         if (addSymbol(board_cell, turn)) {
-            if (checkWinner(turn.index)) {
+            if (checkWinner(boardArray, turn.index)) {
                 postResult(`${turn.name.toUpperCase()} WON THE ROUND!!!`);
                 game.incrementRounds();
                 setBanner();
@@ -38,7 +38,6 @@ const gameBoard = (() => {
             game.alternateTurn();
             incrementMoves();
             ai.makeMove(game.getTurn(), boardArray, moves, game_over);    
-            console.log("after ai:", moves)        
         };
     })) 
     
@@ -64,28 +63,28 @@ const gameBoard = (() => {
         return true;
     }
 
-    function checkWinner(index) {
+    function checkWinner(board, index) {
         row:
-            for (let i = 0, l = boardArray.length; i < l; i++) {
-                for (let j = 0, l2 =boardArray[i].length; j < l2; j++) {
-                    if (boardArray[i][j] !== index) {
+            for (let i = 0, l = board.length; i < l; i++) {
+                for (let j = 0, l2 = board[i].length; j < l2; j++) {
+                    if (board[i][j] !== index) {
                         continue row;
                     }
                 }
                 return true;
             }
         column: 
-            for (let i = 0, l = boardArray[i].length; i < l; i++) {
-                for (let j = 0, l2 = boardArray.length; j < l2; j++) {
-                    if (boardArray[j][i] !== index) {
+            for (let i = 0, l = board[0].length; i < l; i++) {
+                for (let j = 0, l2 = board.length; j < l2; j++) {
+                    if (board[j][i] !== index) {
                         continue column;
                     }
                     
                 }
                 return true;
             }
-        if (boardArray[1][1] === index) {
-            if ((boardArray[0][0] === index && boardArray[2][2] === index) || (boardArray[0][2] === index && boardArray[2][0] === index)) {
+        if (board[1][1] === index) {
+            if ((board[0][0] === index && board[2][2] === index) || (board[0][2] === index && board[2][0] === index)) {
                 return true;
             }
         }
@@ -106,7 +105,6 @@ const gameBoard = (() => {
         game_over = false;
         moves = 0;
         result.textContent = "";
-        console.log(game.getTurn().name);
         ai.makeMove(game.getTurn(), boardArray, moves, game_over);
 
     }
@@ -131,22 +129,28 @@ const gameBoard = (() => {
         board_container.style.display = "none";
     }
 
-    function updateBoard(newBoard) {
-        let boardIndex = 0;
-        for(let i = 0; i < 3; i++) {
-            for (let j = 0; j < 3; j++){
-                boardArray[i][j] = newBoard[boardIndex];
-                boardIndex++;
+    function updateBoard(row, col, value) {
+        boardArray[row][col] = value;
+        return;
+        // let boardIndex = 0;
+        // for(let i = 0; i < 3; i++) {
+        //     for (let j = 0; j < 3; j++){
+        //         boardArray[i][j] = newBoard[boardIndex];
+        //         boardIndex++;
                 
-            }
-        }
+        //     }
+        // }
     }
 
     function incrementMoves() {
         moves++;
     }
 
-    return {boardArray, setBanner, updateBoard, moves, incrementMoves};
+    function getBoard() {
+        return boardArray;
+    }
+
+    return {setBanner, updateBoard, moves, incrementMoves, checkWinner, getBoard};
 })();
 
 const game = (() => {
@@ -211,49 +215,94 @@ const game = (() => {
 })();
 
 const ai = (() => { 
-    let corners = [0, 2, 6, 8];
-    let middleSides = [1, 3, 5, 7];
-
 
     function makeMove(turn, board, moves, game_over) {
         if (turn.ai === false) {
             return;
         }
         console.log("makemove");
-        let newBoard = [];
-        for (let row of board) {
-            for (let cell of row ) {
-                if (!cell) newBoard.push("");
-                else newBoard.push(cell);
+        let bestScore = -1000;
+        let bestMoveRow, bestMoveCol;
+        for (let i = 0, l = board.length; i < l ; i++) {
+            for (let j = 0, l2 = board[i].length; j < l2; j++) {
+                if (!board[i][j]) {
+                    board[i][j] = 2;
+                    let score = minmax(board, 0, 1);
+                    board[i][j] = "";
+                    console.log("score = ", score, "i = ", i, "j = ", j);
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestMoveRow = i;
+                        bestMoveCol = j;
+                    }
+                }
             }
         }
-        if (moves === 0) {
-            newBoard[4] = 2;
-            addAIsymbol(4, turn.symbol);
-        }
-        else if (moves === 1) {
-            if (!newBoard[4]) {
-                newBoard[4] = 2;
-                addAIsymbol(4, turn.symbol);
-            }
-            else { 
-                let randCorner = Math.floor(Math.random() * (middleSides.length));
-                let corner = corners[randCorner];
-                newBoard[corner] = 2;
-                addAIsymbol(corner, turn.symbol);
-            }
-        }
-        gameBoard.updateBoard(newBoard);
+        console.log("Best row = ", bestMoveRow, "Best col = ", bestMoveCol);
+        gameBoard.updateBoard(bestMoveRow, bestMoveCol, 2);
+        addAIsymbol(bestMoveRow, bestMoveCol);
         gameBoard.incrementMoves();
-        if (!game_over) game.alternateTurn();
-        
+        if (!game_over) game.alternateTurn();          
     }
 
-    function addAIsymbol(number, symbol) {
-        let cell = document.getElementById("bc" + number);
-        cell.textContent = symbol;
+    function minmax(board, depth, playerIndex) {
+        let score = evaluate(board, depth);
+        if (score) return score;
+        if (score === 0 && gameBoard.moves >= 9) return score;
+        if (playerIndex === 2) {
+            let bestVal = -1000;
+            for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 3; j++) {
+                    if (!board[i][j]) {
+                        board[i][j] = 2;
+                        bestVal = Math.max(bestVal, minmax(board, depth + 1, 1)); 
+                        board[i][j] = "";
+                        return bestVal;                
+                    }
+                }
+            }
+        }
+        else {
+            let bestVal = 1000;
+            for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 3; j++) {
+                    if (!board[i][j]) {
+                        board[i][j] = 1;
+                        bestVal = Math.min(bestVal, minmax(board, depth + 1, 2)); 
+                        board[i][j] = "";
+                        return bestVal;
+                    }
+                }
+            }
+        }
     }
 
+    function addAIsymbol(row, col) {
+        let symbol = game.getPlayer2().symbol;
+        let cellCount = 0
+        for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < 3; j++) {
+                if (i == row && j === col) {
+                    let targetCell = document.getElementById("bc" + cellCount);
+                    targetCell.textContent = symbol;
+                }
+                cellCount++;
+            }
+        }
+    }
+
+    function evaluate(board, depth) {
+        if (gameBoard.checkWinner(board, 1)){
+            console.log("evaluate", depth - 10);
+            return depth - 10;
+        }
+        if (gameBoard.checkWinner(board, 2)){
+            console.log("evaluate", 10 - depth);
+            return 10 - depth;
+        } 
+        return 0;
+    }
 
     return {makeMove};
-})()
+
+})();
