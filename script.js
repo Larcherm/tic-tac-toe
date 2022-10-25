@@ -32,11 +32,11 @@ const gameBoard = (() => {
                 game.incrementRounds();
                 setBanner();
             }
-            else if (moves >= 9) {
-                postResult("IT'S A TIE !")
+            incrementMoves();
+            if (moves >= 9) {
+                postResult("IT'S A TIE !");
             }
             game.alternateTurn();
-            incrementMoves();
             ai.makeMove(game.getTurn(), boardArray, moves, game_over);    
         };
     })) 
@@ -63,7 +63,7 @@ const gameBoard = (() => {
         return true;
     }
 
-    function checkWinner(board, index) {
+    function checkWinner(board = boardArray, index) {
         row:
             for (let i = 0, l = board.length; i < l; i++) {
                 for (let j = 0, l2 = board[i].length; j < l2; j++) {
@@ -105,6 +105,7 @@ const gameBoard = (() => {
         game_over = false;
         moves = 0;
         result.textContent = "";
+        game.alternateTurn(3);
         ai.makeMove(game.getTurn(), boardArray, moves, game_over);
 
     }
@@ -112,6 +113,7 @@ const gameBoard = (() => {
     function postResult(message) {
         game_over = true;
         result.textContent = message;
+        game.incrementTotalrounds();
     }
 
     function setBanner() {
@@ -124,6 +126,8 @@ const gameBoard = (() => {
     }
 
     function restart() {
+        game.incrementTotalrounds(0);
+        game.alternateTurn(1);
         banner.style.display = "none";
         resetBoard();
         board_container.style.display = "none";
@@ -150,12 +154,13 @@ const gameBoard = (() => {
         return boardArray;
     }
 
-    return {setBanner, updateBoard, moves, incrementMoves, checkWinner, getBoard};
+    return {setBanner, updateBoard, moves, incrementMoves, checkWinner, getBoard, postResult};
 })();
 
 const game = (() => {
     const start_button = document.getElementById("start-button");
     const radio_result = document.getElementsByName("opponent");
+    let rounds = 0;
     let turn, player1, player2;
 
     start_button.addEventListener("click", e => {
@@ -164,17 +169,28 @@ const game = (() => {
         document.getElementById("board-container").style.display = "flex";
     })
 
-    function alternateTurn() {
-        if (turn === player1) {
-            turn = player2;
-
-            return;
+    function alternateTurn(index=0) {
+        if (!index) {
+            if (turn === player1) {
+                    turn = player2;
+            }
+            else if (turn === player2) {
+                turn = player1;
+            }
         }
-        else if (turn === player2) {
+        else if(index === 1) {
             turn = player1;
-            return;
         }
+        else if(index === 2) {
+            turn = player2;
+        }
+        else if (index === 3) {
+            if (rounds % 2 === 0) turn = player1;
+            else turn = player2;
+        }
+        return;
     }
+
 
     function getTurn () {
         return turn;
@@ -196,6 +212,12 @@ const game = (() => {
         
     }
 
+    function incrementTotalrounds(reset = 1) {
+        if (reset != 1) rounds = 0;
+        else rounds++;
+
+    }
+
     function setPlayers() {
         player1 = Player(document.getElementById("first-player").value, "X", 1);
         for (let option of radio_result) {
@@ -211,16 +233,16 @@ const game = (() => {
         turn = player1;
     }
 
-    return {getTurn, alternateTurn, getPlayer1, getPlayer2, incrementRounds};
+    return {getTurn, alternateTurn, getPlayer1, getPlayer2, incrementRounds, incrementTotalrounds};
 })();
 
 const ai = (() => { 
 
     function makeMove(turn, board, moves, game_over) {
-        if (turn.ai === false) {
+        console.log("makemove");
+        if (turn.ai === false || game_over) {
             return;
         }
-        console.log("makemove");
         let bestScore = -1000;
         let bestMoveRow, bestMoveCol;
         for (let i = 0, l = board.length; i < l ; i++) {
@@ -229,7 +251,6 @@ const ai = (() => {
                     board[i][j] = 2;
                     let score = minmax(board, 0, 1);
                     board[i][j] = "";
-                    console.log("score = ", score, "i = ", i, "j = ", j);
                     if (score > bestScore) {
                         bestScore = score;
                         bestMoveRow = i;
@@ -238,17 +259,27 @@ const ai = (() => {
                 }
             }
         }
-        console.log("Best row = ", bestMoveRow, "Best col = ", bestMoveCol);
+        // console.log("Best row = ", bestMoveRow, "Best col = ", bestMoveCol);
+        board[bestMoveRow][bestMoveCol] = 2;
         gameBoard.updateBoard(bestMoveRow, bestMoveCol, 2);
         addAIsymbol(bestMoveRow, bestMoveCol);
+        if (gameBoard.checkWinner(board, 2)) {
+            gameBoard.postResult("COMPUTER WON THE ROUND");
+            game.incrementRounds();
+        }
+        else game.alternateTurn(); 
         gameBoard.incrementMoves();
-        if (!game_over) game.alternateTurn();          
+        moves++;
+        if (moves >= 9) {
+            gameBoard.postResult("IT'S A TIE !");
+        }
+        gameBoard.setBanner();
     }
 
     function minmax(board, depth, playerIndex) {
         let score = evaluate(board, depth);
-        if (score) return score;
-        if (score === 0 && gameBoard.moves >= 9) return score;
+        if (score != 0) return score;
+        if (!hasEmptyCell(board)) return 0;
         if (playerIndex === 2) {
             let bestVal = -1000;
             for (let i = 0; i < 3; i++) {
@@ -257,10 +288,10 @@ const ai = (() => {
                         board[i][j] = 2;
                         bestVal = Math.max(bestVal, minmax(board, depth + 1, 1)); 
                         board[i][j] = "";
-                        return bestVal;                
                     }
                 }
             }
+            return bestVal;                
         }
         else {
             let bestVal = 1000;
@@ -270,10 +301,10 @@ const ai = (() => {
                         board[i][j] = 1;
                         bestVal = Math.min(bestVal, minmax(board, depth + 1, 2)); 
                         board[i][j] = "";
-                        return bestVal;
                     }
                 }
             }
+            return bestVal;                
         }
     }
 
@@ -285,6 +316,7 @@ const ai = (() => {
                 if (i == row && j === col) {
                     let targetCell = document.getElementById("bc" + cellCount);
                     targetCell.textContent = symbol;
+                    targetCell.classList.add("used");
                 }
                 cellCount++;
             }
@@ -293,14 +325,23 @@ const ai = (() => {
 
     function evaluate(board, depth) {
         if (gameBoard.checkWinner(board, 1)){
-            console.log("evaluate", depth - 10);
             return depth - 10;
-        }
-        if (gameBoard.checkWinner(board, 2)){
-            console.log("evaluate", 10 - depth);
-            return 10 - depth;
         } 
-        return 0;
+        else if (gameBoard.checkWinner(board, 2)){
+            return 10 - depth;
+        }
+        else return 0;
+    }
+
+    function hasEmptyCell(board) {
+        for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < 3; j++) {
+                if (!board[i][j]) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     return {makeMove};

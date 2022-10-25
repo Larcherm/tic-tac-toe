@@ -1,5 +1,11 @@
+@font-face {
+    font-family: "BrusselsCity";
+    src: url(resources/BrusselsCityPersonalUsed-L3Lon.otf) format("opentype");
+}
+
 * {
     box-sizing: border-box;
+    font-family: "BrusselsCity";
 }
 
 body {
@@ -12,6 +18,8 @@ body {
     padding: 0;
     margin: 0;
     background-color: #f1c7ef;
+    font-family: "BrusselsCity";
+
 }
 
 .header {
@@ -39,10 +47,16 @@ form {
     z-index: 0;
 }
 
+.player-container {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
 input[type="text"] {
     width: 8rem;
-    height: 1.5rem;
-    font-size: 20px;
+    height: 2rem;
+    font-size: 16px;
 }
 
 .radio-container {
@@ -129,4 +143,5 @@ input[type="text"] {
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    text-align: center;
 }

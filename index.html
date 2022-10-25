@@ -12,15 +12,17 @@
         <h1>TIC TAC TOE</h1>
     </div>
     <form id="form">
-        <div class="first-player-container">
-            <label for="first-player">First Player: </label>
+        <div class="player-container">
+            <label for="first-player">First Player</label>
             <input type="text" id="first-player" placeholder="Name">
         </div>
         <div class="radio-container">
             <div class="radio-div">
                 <input type="radio" value="human" id="human" name="opponent" >
-                <label for="human">Human: </label>
-                <input type="text" id="second-player" placeholder="Name">
+                <div class="play-container">
+                    <label for="human">Human: </label>
+                    <input type="text" id="second-player" placeholder="Name">
+                </div>
             </div>
             
             <div class="radio-div radio-computer">
