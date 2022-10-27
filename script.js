@@ -310,17 +310,11 @@ const ai = (() => {
 
     function addAIsymbol(row, col) {
         let symbol = game.getPlayer2().symbol;
-        let cellCount = 0
-        for (let i = 0; i < 3; i++) {
-            for (let j = 0; j < 3; j++) {
-                if (i == row && j === col) {
-                    let targetCell = document.getElementById("bc" + cellCount);
-                    targetCell.textContent = symbol;
-                    targetCell.classList.add("used");
-                }
-                cellCount++;
-            }
-        }
+        console.log(row, col);
+        let cellCount = 3 * row + col;
+        let targetCell = document.getElementById("bc" + cellCount);
+        targetCell.textContent = symbol;
+        targetCell.classList.add("used");
     }
 
     function evaluate(board, depth) {
